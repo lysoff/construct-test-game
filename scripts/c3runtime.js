@@ -2808,7 +2808,8 @@ self.C3_ExpressionFuncs = [
 			return () => f0();
 		},
 		() => "GOOD",
-		() => "Get list done"
+		() => "Get list done",
+		() => "Bad"
 ];
 
 
