@@ -2355,6 +2355,8 @@ self["C3_Shaders"] = {};
                 window.bridge.achievements.getList()
                     .then(data => {
                         this.isLastActionCompletedSuccessfully = true
+
+                        console.log('addon [data]:', data);
                         this.achievementsList = data
                     })
                     .catch(error => console.log(error))
@@ -2548,6 +2550,7 @@ self["C3_Shaders"] = {};
 
         // achievements
         AchievementsCount() {
+            console.log('addon [this.achievementsList]:', this.achievementsList);
             if (!this.achievementsList) {
                 return 0
             }
