@@ -2803,12 +2803,13 @@ self.C3_ExpressionFuncs = [
 		() => "53bccce8f444c3e813c1",
 		() => "achievement",
 		() => "New one",
+		() => "Clicked",
+		() => "GOOD",
+		() => "Get list done",
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => f0();
 		},
-		() => "GOOD",
-		() => "Get list done",
 		() => "Bad"
 ];
 

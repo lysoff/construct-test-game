@@ -9,7 +9,6 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.PlaygamaBridge.Acts.AchievementsUnlock,
 		C3.Plugins.PlaygamaBridge.Cnds.OnAchievementsUnlockCompleted,
 		C3.Plugins.Browser.Acts.ConsoleLog,
-		C3.Plugins.PlaygamaBridge.Exps.AchievementsCount,
 		C3.Plugins.PlaygamaBridge.Cnds.IsLastActionCompletedSuccessfully,
 		C3.Plugins.PlaygamaBridge.Acts.AchievementsGetList,
 		C3.Plugins.PlaygamaBridge.Cnds.OnAchievementsGetListCompleted,
