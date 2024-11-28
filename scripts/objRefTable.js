@@ -13,6 +13,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.PlaygamaBridge.Cnds.IsLastActionCompletedSuccessfully,
 		C3.Plugins.PlaygamaBridge.Acts.AchievementsGetList,
 		C3.Plugins.PlaygamaBridge.Cnds.OnAchievementsGetListCompleted,
+		C3.Plugins.PlaygamaBridge.Exps.AchievementsList,
 		C3.Plugins.PlaygamaBridge.Acts.AchievementsShowNativePopup
 	];
 };

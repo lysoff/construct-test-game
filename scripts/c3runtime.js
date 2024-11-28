@@ -2549,8 +2549,11 @@ self["C3_Shaders"] = {};
         },
 
         // achievements
+        AchievementsList() {
+            return JSON.stringify(this.achievementsList)
+        },
+
         AchievementsCount() {
-            console.log('addon [this.achievementsList]:', this.achievementsList);
             if (!this.achievementsList) {
                 return 0
             }
@@ -2804,7 +2807,8 @@ self.C3_ExpressionFuncs = [
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => f0();
 		},
-		() => "GOOD"
+		() => "GOOD",
+		() => "Get list done"
 ];
 
 
