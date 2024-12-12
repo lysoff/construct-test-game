@@ -1258,14 +1258,14 @@ self["C3_Shaders"] = {};
             this.conditions = C3.Plugins.PlaygamaBridge.Cnds
             this.actions = C3.Plugins.PlaygamaBridge.Acts
 
-            let cdnUrl = 'https://lysoff.github.io/unity-test-game/playgama-bridge.js'
+            let cdnUrl = 'https://cdn.jsdelivr.net/gh/playgama/bridge@1.19.0/dist/playgama-bridge.js'
             if (properties[1] !== '') {
                 cdnUrl = properties[1]
             }
 
             this.gameDistributionGameId = properties[2]
             this.y8GameId = properties[3]
-            this.y8HostId = properties[4]
+            this.y8ChannelId = properties[4]
             this.y8AdsenseId = properties[5]
             this.laggedDevId = properties[6]
             this.laggedPublisherId = properties[7]
@@ -1388,11 +1388,16 @@ self["C3_Shaders"] = {};
                             bridgeOptions.platforms['game_distribution'] = { gameId: this.gameDistributionGameId }
                         }
 
-                        if (this.y8GameId !== '' && this.y8HostId !== '' && this.y8AdsenseId !== '') {
+                        if (this.y8GameId !== '') {
                             bridgeOptions.platforms['y8'] = { 
                                 gameId: this.y8GameId,
-                                hostId: this.y8HostId,
-                                adsenseId: this.y8AdsenseId,
+                            }
+
+                            if (this.y8ChannelId !== '') {
+                                bridgeOptions.platforms['y8'].channelId = this.y8ChannelId
+                            } 
+                            if (this.y8AdsenseId !== '' ) {
+                                bridgeOptions.platforms['y8'].adsenseId = this.y8AdsenseId
                             }
                         }
 
@@ -2267,8 +2272,9 @@ self["C3_Shaders"] = {};
 
             return new Promise(resolve => {
                 window.bridge.payments.purchase(this.actionParametersContainer)
-                    .then(() => {
+                    .then(data => {
                         this.isLastActionCompletedSuccessfully = true
+                        this.paymentsPurchase = data
                     })
                     .catch(error => console.log(error))
                     .finally(() => {
@@ -2352,15 +2358,14 @@ self["C3_Shaders"] = {};
             this.isLastActionCompletedSuccessfully = false
 
             return new Promise(resolve => {
-                window.bridge.achievements.getList()
+                window.bridge.achievements.getList(this.actionParametersContainer)
                     .then(data => {
                         this.isLastActionCompletedSuccessfully = true
-
-                        console.log('addon [data]:', data);
                         this.achievementsList = data
                     })
                     .catch(error => console.log(error))
                     .finally(() => {
+                        this.actionParametersContainer = {}
                         this.Trigger(this.conditions.OnAchievementsGetListCompleted)
                         resolve()
                     })
@@ -2371,12 +2376,13 @@ self["C3_Shaders"] = {};
             this.isLastActionCompletedSuccessfully = false
 
             return new Promise(resolve => {
-                window.bridge.achievements.showNativePopup()
+                window.bridge.achievements.showNativePopup(this.actionParametersContainer)
                     .then(() => {
                         this.isLastActionCompletedSuccessfully = true
                     })
                     .catch(error => console.log(error))
                     .finally(() => {
+                        this.actionParametersContainer = {}
                         this.Trigger(this.conditions.OnAchievementsShowNativePopupCompleted)
                         resolve()
                     })
@@ -2549,10 +2555,6 @@ self["C3_Shaders"] = {};
         },
 
         // achievements
-        AchievementsList() {
-            return JSON.stringify(this.achievementsList)
-        },
-
         AchievementsCount() {
             if (!this.achievementsList) {
                 return 0
@@ -2597,6 +2599,36 @@ self["C3_Shaders"] = {};
         },
 
         // payments
+        PaymentsLastPurchasePropertiesCount() {
+            if (!this.paymentsPurchase) {
+                return 0
+            }
+
+            let properties = Object.keys(this.paymentsPurchase)
+            return properties.length
+        },
+        PaymentsLastPurchasePropertyName(propertyIndex) {
+            if (!this.paymentsPurchase) {
+                return ''
+            }
+
+            let properties = Object.keys(this.paymentsPurchase)
+            return properties[propertyIndex]
+        },
+        PaymentsLastPurchasePropertyValue(property) {
+            if (!this.paymentsPurchase) {
+                return ''
+            }
+
+            if (typeof property === 'number') {
+                let properties = Object.keys(this.paymentsPurchase)
+                let propertyName = properties[property]
+                return this.paymentsPurchase[propertyName]
+            }
+
+            return this.paymentsPurchase[property]
+        },
+
         PaymentsPurchasesCount() {
             if (!this.paymentsPurchases) {
                 return 0
@@ -2691,14 +2723,14 @@ self["C3_Shaders"] = {};
 
 }
 
-// scripts/plugins/Button/c3runtime/runtime.js
-{
-{const a=self.C3,b="button";a.Plugins.Button=class extends a.SDKDOMPluginBase{constructor(e){super(e,b),this.AddElementMessageHandler("click",(e,t)=>e._OnClick(t))}Release(){super.Release()}}}{const g=self.C3;g.Plugins.Button.Type=class extends g.SDKTypeBase{constructor(e){super(e)}Release(){super.Release()}OnCreate(){}}}{const j=self.C3,k=self.C3X,l=0,m=1,n=2,o=3,p=4,q=5,r=6,s=7,t=8,u="button",v=(j.Plugins.Button.Instance=class extends j.SDKDOMInstanceBase{constructor(e,i){super(e,u),this._text="OK",this._isCheckbox=!1,this._isChecked=!1,this._title="",this._id="",this._className="",this._isEnabled=!0,this._autoFontSize=!0,i&&(this._isCheckbox=1===i[l],this._text=i[m],this._title=i[n],this.GetWorldInfo().SetVisible(i[o]),this._isEnabled=i[p],this._autoFontSize=i[q],this._isChecked=i[r],this._id=i[s],this._className=i[t]),this.CreateElement({"id":this._id,"className":this._className})}Release(){super.Release()}GetElementState(){return{"text":this._text,"isCheckbox":this._isCheckbox,"isChecked":this._isChecked,"title":this._title,"isVisible":this.GetWorldInfo().IsVisible(),"isEnabled":this._isEnabled}}async _OnClick(e){this._isChecked=e["isChecked"],this.DispatchScriptEvent("click",!0),await this.TriggerAsync(j.Plugins.Button.Cnds.OnClicked)}_SetText(e){this._text!==e&&(this._text=e,this.UpdateElementState())}_GetText(){return this._text}_SetTooltip(e){this._title!==e&&(this._title=e,this.UpdateElementState())}_GetTooltip(){return this._title}_SetEnabled(e){this._isEnabled!==(e=!!e)&&(this._isEnabled=e,this.UpdateElementState())}_IsEnabled(){return this._isEnabled}_SetChecked(e){this._isCheckbox&&this._isChecked!==(e=!!e)&&(this._isChecked=e,this.UpdateElementState())}_IsChecked(){return this._isChecked}Draw(e){}SaveToJson(){return{"text":this._text,"checked":this._isChecked,"title":this._title,"enabled":this._isEnabled}}LoadFromJson(e){this._text=e["text"],this._isChecked=e["checked"],this._title=e["title"],this._isEnabled=e["enabled"],this.UpdateElementState()}GetPropertyValueByIndex(e){switch(e){case m:return this._GetText();case n:return this._GetTooltip();case p:return this._IsEnabled();case q:return this._autoFontSize;case r:return this._IsChecked()}}SetPropertyValueByIndex(e,t){switch(e){case m:this._SetText(t);break;case n:this._SetTooltip(t);break;case p:this._SetEnabled(!!t);break;case q:this._autoFontSize=!!t;break;case r:this._SetChecked(!!t)}}GetDebuggerProperties(){const e="plugins.button";return[{title:e+".name",properties:[{name:e+".properties.text.name",value:this._GetText(),onedit:e=>this._SetText(e)},{name:e+".properties.enabled.name",value:this._IsEnabled(),onedit:e=>this._SetEnabled(e)},{name:e+".properties.checked.name",value:this._IsChecked(),onedit:e=>this._SetChecked(e)}]}]}GetScriptInterfaceClass(){return self.IButtonInstance}},new WeakMap);self.IButtonInstance=class extends self.IDOMInstance{constructor(){super(),v.set(this,self.IInstance._GetInitInst().GetSdkInstance())}set text(e){k.RequireString(e),v.get(this)._SetText(e)}get text(){return v.get(this)._GetText()}set tooltip(e){k.RequireString(e),v.get(this)._SetTooltip(e)}get tooltip(){return v.get(this)._GetTooltip()}set isEnabled(e){v.get(this)._SetEnabled(e)}get isEnabled(){return v.get(this)._IsEnabled()}set isChecked(e){v.get(this)._SetChecked(e)}get isChecked(){return v.get(this)._IsChecked()}}}{const S=self.C3;S.Plugins.Button.Cnds={OnClicked(){return!0},IsChecked(){return this._isChecked},CompareText(e,t){return t?this._text===e:S.equalsNoCase(this._text,e)}}}{const V=self.C3;V.Plugins.Button.Acts={SetText(e){this._SetText(e)},SetTooltip(e){this._SetTooltip(e)},SetChecked(e){this._SetChecked(0!==e)},ToggleChecked(){this._isCheckbox&&(this._isChecked=!this._isChecked,this.UpdateElementState())}}}{const Z=self.C3;Z.Plugins.Button.Exps={Text(){return this._text}}}
-}
-
 // scripts/plugins/Browser/c3runtime/runtime.js
 {
 {const C3=self.C3;C3.Plugins.Browser=class BrowserPlugin extends C3.SDKPluginBase{constructor(e){super(e)}Release(){super.Release()}}}{const C3=self.C3;C3.Plugins.Browser.Type=class BrowserType extends C3.SDKTypeBase{constructor(e){super(e)}Release(){super.Release()}OnCreate(){}}}{const C3=self.C3,DOM_COMPONENT_ID="browser";C3.Plugins.Browser.Instance=class BrowserInstance extends C3.SDKInstanceBase{constructor(e,t){super(e,DOM_COMPONENT_ID),this._initLocationStr="",this._isOnline=!1,this._referrer="",this._docTitle="",this._isCookieEnabled=!1,this._screenWidth=0,this._screenHeight=0,this._windowOuterWidth=0,this._windowOuterHeight=0,this._isConstructArcade=!1,this._cssStyleMap=new Map,this._isInstallAvailable=!1,this._installResult="",this._isWarnOnCloseEnabled=!1,this.AddDOMMessageHandlers([["online-state",e=>this._OnOnlineStateChanged(e)],["backbutton",()=>this._OnBackButton()],["sw-message",e=>this._OnSWMessage(e)],["hashchange",e=>this._OnHashChange(e)],["install-available",()=>this._OnInstallAvailable()],["app-installed",e=>this._OnAppInstalled(e)]]);const n=this.GetRuntime().Dispatcher();this._disposables=new C3.CompositeDisposable(C3.Disposable.From(n,"afterfirstlayoutstart",()=>this._OnAfterFirstLayoutStart()),C3.Disposable.From(n,"window-resize",()=>this._OnWindowResize()),C3.Disposable.From(n,"suspend",()=>this._OnSuspend()),C3.Disposable.From(n,"resume",()=>this._OnResume())),this._runtime.AddLoadPromise(this.PostToDOMAsync("get-initial-state",{"exportType":this._runtime.GetExportType()}).then(e=>{this._initLocationStr=e["location"],this._isOnline=e["isOnline"],this._referrer=e["referrer"],this._docTitle=e["title"],this._isCookieEnabled=e["isCookieEnabled"],this._screenWidth=e["screenWidth"],this._screenHeight=e["screenHeight"],this._windowOuterWidth=e["windowOuterWidth"],this._windowOuterHeight=e["windowOuterHeight"],this._isConstructArcade=e["isConstructArcade"]}))}Release(){super.Release()}_OnAfterFirstLayoutStart(){this.PostToDOM("ready-for-sw-messages")}async _OnOnlineStateChanged(e){const t=!!e["isOnline"];this._isOnline!==t&&(this._isOnline=t,this._isOnline?await this.TriggerAsync(C3.Plugins.Browser.Cnds.OnOnline):await this.TriggerAsync(C3.Plugins.Browser.Cnds.OnOffline))}async _OnWindowResize(){await this.TriggerAsync(C3.Plugins.Browser.Cnds.OnResize)}_OnSuspend(){this.Trigger(C3.Plugins.Browser.Cnds.OnPageHidden)}_OnResume(){this.Trigger(C3.Plugins.Browser.Cnds.OnPageVisible)}async _OnBackButton(){await this.TriggerAsync(C3.Plugins.Browser.Cnds.OnBackButton)}_OnSWMessage(e){const t=e["type"];"downloading-update"===t?this.Trigger(C3.Plugins.Browser.Cnds.OnUpdateFound):"update-ready"===t||"update-pending"===t?this.Trigger(C3.Plugins.Browser.Cnds.OnUpdateReady):"offline-ready"===t&&this.Trigger(C3.Plugins.Browser.Cnds.OnOfflineReady)}_OnHashChange(e){this._initLocationStr=e["location"],this.Trigger(C3.Plugins.Browser.Cnds.OnHashChange)}_OnInstallAvailable(){this._isInstallAvailable=!0,this.Trigger(C3.Plugins.Browser.Cnds.OnInstallAvailable)}_OnAppInstalled(e){this._isInstallAvailable=!1,this.Trigger(C3.Plugins.Browser.Cnds.OnAppInstalled)}_IsWarnOnCloseEnabled(){return this._isWarnOnCloseEnabled}_SetWarnOnCloseEnabled(e){this._isWarnOnCloseEnabled!==(e=!!e)&&(this._isWarnOnCloseEnabled=e,this.PostToDOM("set-warn-on-close",{"enabled":e}))}GetDebuggerProperties(){const e="plugins.browser.debugger";return[{title:"plugins.browser.name",properties:[{name:e+".user-agent",value:navigator.userAgent},{name:e+".is-online",value:this._isOnline},{name:e+".is-fullscreen",value:this._runtime.GetCanvasManager().IsDocumentFullscreen()}]}]}}}{const C3=self.C3;C3.Plugins.Browser.Cnds={IsOnline(){return this._isOnline},OnOnline(){return!0},OnOffline(){return!0},OnResize(){return!0},CookiesEnabled(){return this._isCookieEnabled},IsFullscreen(){return this._runtime.GetCanvasManager().IsDocumentFullscreen()},OnBackButton(){return!0},IsPortraitLandscape(e){const t=this._runtime.GetCanvasManager().GetLastWidth(),n=this._runtime.GetCanvasManager().GetLastHeight(),s=t<=n?0:1;return s===e},OnUpdateFound(){return!0},OnUpdateReady(){return!0},OnOfflineReady(){return!0},OnHashChange(){return!0},OnInstallAvailable(){return!0},IsInstallAvailable(){return this._isInstallAvailable},OnInstallResult(e){switch(e){case 0:return"accepted"===this._installResult;case 1:return"dismissed"===this._installResult;case 2:return"error"===this._installResult;case 3:return!0;default:return!1}},OnAppInstalled(){return!0},CompareDisplayMode(e){const t=this._runtime.GetCanvasManager().GetCssDisplayMode();switch(e){case 0:return"browser"===t;case 1:return"minimal-ui"===t;case 2:return"standalone"===t;case 3:return"fullscreen"===t;default:return!1}},IsWarnOnCloseEnabled(){return this._IsWarnOnCloseEnabled()},PageVisible(){return!this._runtime.IsSuspended()},OnPageHidden(){return!0},OnPageVisible(){return!0},HasJava(){return!1},IsDownloadingUpdate(){return!1},OnMenuButton(){return!1},OnSearchButton(){return!1},IsMetered(){return!1},IsCharging(){return!0},SupportsFullscreen(){return!0}}}{const C3=self.C3,ORIENTATIONS=["portrait","landscape","portrait-primary","portrait-secondary","landscape-primary","landscape-secondary"];C3.Plugins.Browser.Acts={Alert(e){this.PostToDOM("alert",{"message":e.toString()})},Close(){this._isConstructArcade||(this._runtime.IsDebug()?self.C3Debugger.CloseWindow():this.PostToDOM("close"))},Focus(){this.PostToDOM("set-focus",{"isFocus":!0})},Blur(){this.PostToDOM("set-focus",{"isFocus":!1})},GoBack(){this._isConstructArcade||this.PostToDOM("navigate",{"type":"back"})},GoForward(){this._isConstructArcade||this.PostToDOM("navigate",{"type":"forward"})},GoHome(){},Reload(){this._isConstructArcade||(this._runtime.IsDebug()?this._runtime.PostToDebugger({"type":"reload"}):this.PostToDOM("navigate",{"type":"reload"}))},GoToURL(e,t){this._PostToDOMMaybeSync("navigate",{"type":"url","url":e,"target":t,"exportType":this._runtime.GetExportType()})},GoToURLWindow(e,t){this._PostToDOMMaybeSync("navigate",{"type":"new-window","url":e,"tag":t,"exportType":this._runtime.GetExportType()})},RequestFullScreen(e,t){2<=e&&(e+=1),1===(e=6===e?2:e)&&(e=0);const n=C3.CanvasManager._FullscreenModeNumberToString(e);this._runtime.GetCanvasManager().SetDocumentFullscreenMode(n),this._PostToDOMMaybeSync("request-fullscreen",{"navUI":t})},CancelFullScreen(){this._PostToDOMMaybeSync("exit-fullscreen")},Vibrate(e){const n=e.split(",");for(let e=0,t=n.length;e<t;++e)n[e]=parseInt(n[e],10);this._PostToDOMMaybeSync("vibrate",{"pattern":n})},async InvokeDownload(e,t){if(e&&t){const n=await this._runtime.GetAssetManager().GetProjectFileUrl(e);this._runtime.InvokeDownload(n,t)}},InvokeDownloadString(e,t,n){if(n){const s=`data:${t},`+encodeURIComponent(e);this._runtime.InvokeDownload(s,n)}},ConsoleLog(e,t){t=t.toString(),0===e?console.log(t):1===e?console.warn(t):2===e&&console.error(t)},ConsoleGroup(e){console.group(e)},ConsoleGroupEnd(){console.groupEnd()},ExecJs(jsStr){try{eval(jsStr)}catch(err){console.error("Error executing JavaScript: ",err)}},LockOrientation(e){if(!((e=Math.floor(e))<0||e>=ORIENTATIONS.length)){const t=ORIENTATIONS[e];this._PostToDOMMaybeSync("lock-orientation",{"orientation":t})}},UnlockOrientation(){this._PostToDOMMaybeSync("unlock-orientation")},LoadStyleSheet(e){this._runtime.GetAssetManager().LoadStyleSheet(e)},async SetDocumentCSSStyle(e,t,n,s){await this.PostToDOMAsync("set-document-css-style",{"prop":C3.CSSToCamelCase(e),"value":t,"selector":n,"is-all":0!==s})},async GetDocumentCSSStyle(e,t,n){const s=await this.PostToDOMAsync("get-document-css-style",{"prop":e,"selector":t});s["isOk"]&&this._cssStyleMap.set(n.toLowerCase(),s["result"].trim())},SetHash(e){this.PostToDOM("set-hash",{"hash":e})},SetWindowSize(e,t){this.PostToDOM("set-window-size",{"windowWidth":e,"windowHeight":t})},SetWindowPosition(e,t){this.PostToDOM("set-window-position",{"windowX":e,"windowY":t})},async RequestInstall(){const e=await this.PostToDOMAsync("request-install");this._installResult=e["result"],this.Trigger(C3.Plugins.Browser.Cnds.OnInstallResult)},SetWarnOnClose(e){this._SetWarnOnCloseEnabled(e)}}}{const C3=self.C3;C3.Plugins.Browser.Exps={URL(){return this._runtime.IsInWorker()?this._initLocationStr:location.toString()},Protocol(){return(this._runtime.IsInWorker()?new URL(this._initLocationStr):location).protocol},Domain(){return(this._runtime.IsInWorker()?new URL(this._initLocationStr):location).hostname},Port(){return(this._runtime.IsInWorker()?new URL(this._initLocationStr):location).port},PathName(){return(this._runtime.IsInWorker()?new URL(this._initLocationStr):location).pathname},Hash(){return(this._runtime.IsInWorker()?new URL(this._initLocationStr):location).hash},QueryString(){return(this._runtime.IsInWorker()?new URL(this._initLocationStr):location).search},QueryParam(e){const t=(this._runtime.IsInWorker()?new URL(this._initLocationStr):location).search,n=RegExp("[?&]"+e+"=([^&]*)").exec(t);return n?decodeURIComponent(n[1].replace(/\+/g," ")):""},Referrer(){return this._referrer},Title(){return this._docTitle},Language(){return navigator.language},Platform(){return navigator.platform},UserAgent(){return navigator.userAgent},ExecJS(jsStr){let result=0;try{result=eval(jsStr)}catch(err){console.error("Error executing JavaScript: ",err)}return"number"==typeof result||"string"==typeof result?result:"boolean"==typeof result&&result?1:0},CSSStyleValue(e){return this._cssStyleMap.get(e)||""},Name(){return navigator.appName},Version(){return navigator.appVersion},Product(){return navigator.product},Vendor(){return navigator.vendor},BatteryLevel(){return 1},BatteryTimeLeft(){return 1/0},Bandwidth(){const e=navigator["connection"];return e&&(e["downlink"]||e["downlinkMax"]||e["bandwidth"])||1/0},ConnectionType(){const e=navigator["connection"];return e&&e["type"]||"unknown"},DevicePixelRatio(){return self.devicePixelRatio},ScreenWidth(){return this._screenWidth},ScreenHeight(){return this._screenHeight},WindowInnerWidth(){return this._runtime.GetCanvasManager().GetLastWidth()},WindowInnerHeight(){return this._runtime.GetCanvasManager().GetLastHeight()},WindowOuterWidth(){return this._windowOuterWidth},WindowOuterHeight(){return this._windowOuterWidth},DisplayMode(){return this._runtime.GetCanvasManager().GetCssDisplayMode()},InstallResult(){return this._installResult}}}
+}
+
+// scripts/plugins/Button/c3runtime/runtime.js
+{
+{const a=self.C3,b="button";a.Plugins.Button=class extends a.SDKDOMPluginBase{constructor(e){super(e,b),this.AddElementMessageHandler("click",(e,t)=>e._OnClick(t))}Release(){super.Release()}}}{const g=self.C3;g.Plugins.Button.Type=class extends g.SDKTypeBase{constructor(e){super(e)}Release(){super.Release()}OnCreate(){}}}{const j=self.C3,k=self.C3X,l=0,m=1,n=2,o=3,p=4,q=5,r=6,s=7,t=8,u="button",v=(j.Plugins.Button.Instance=class extends j.SDKDOMInstanceBase{constructor(e,i){super(e,u),this._text="OK",this._isCheckbox=!1,this._isChecked=!1,this._title="",this._id="",this._className="",this._isEnabled=!0,this._autoFontSize=!0,i&&(this._isCheckbox=1===i[l],this._text=i[m],this._title=i[n],this.GetWorldInfo().SetVisible(i[o]),this._isEnabled=i[p],this._autoFontSize=i[q],this._isChecked=i[r],this._id=i[s],this._className=i[t]),this.CreateElement({"id":this._id,"className":this._className})}Release(){super.Release()}GetElementState(){return{"text":this._text,"isCheckbox":this._isCheckbox,"isChecked":this._isChecked,"title":this._title,"isVisible":this.GetWorldInfo().IsVisible(),"isEnabled":this._isEnabled}}async _OnClick(e){this._isChecked=e["isChecked"],this.DispatchScriptEvent("click",!0),await this.TriggerAsync(j.Plugins.Button.Cnds.OnClicked)}_SetText(e){this._text!==e&&(this._text=e,this.UpdateElementState())}_GetText(){return this._text}_SetTooltip(e){this._title!==e&&(this._title=e,this.UpdateElementState())}_GetTooltip(){return this._title}_SetEnabled(e){this._isEnabled!==(e=!!e)&&(this._isEnabled=e,this.UpdateElementState())}_IsEnabled(){return this._isEnabled}_SetChecked(e){this._isCheckbox&&this._isChecked!==(e=!!e)&&(this._isChecked=e,this.UpdateElementState())}_IsChecked(){return this._isChecked}Draw(e){}SaveToJson(){return{"text":this._text,"checked":this._isChecked,"title":this._title,"enabled":this._isEnabled}}LoadFromJson(e){this._text=e["text"],this._isChecked=e["checked"],this._title=e["title"],this._isEnabled=e["enabled"],this.UpdateElementState()}GetPropertyValueByIndex(e){switch(e){case m:return this._GetText();case n:return this._GetTooltip();case p:return this._IsEnabled();case q:return this._autoFontSize;case r:return this._IsChecked()}}SetPropertyValueByIndex(e,t){switch(e){case m:this._SetText(t);break;case n:this._SetTooltip(t);break;case p:this._SetEnabled(!!t);break;case q:this._autoFontSize=!!t;break;case r:this._SetChecked(!!t)}}GetDebuggerProperties(){const e="plugins.button";return[{title:e+".name",properties:[{name:e+".properties.text.name",value:this._GetText(),onedit:e=>this._SetText(e)},{name:e+".properties.enabled.name",value:this._IsEnabled(),onedit:e=>this._SetEnabled(e)},{name:e+".properties.checked.name",value:this._IsChecked(),onedit:e=>this._SetChecked(e)}]}]}GetScriptInterfaceClass(){return self.IButtonInstance}},new WeakMap);self.IButtonInstance=class extends self.IDOMInstance{constructor(){super(),v.set(this,self.IInstance._GetInitInst().GetSdkInstance())}set text(e){k.RequireString(e),v.get(this)._SetText(e)}get text(){return v.get(this)._GetText()}set tooltip(e){k.RequireString(e),v.get(this)._SetTooltip(e)}get tooltip(){return v.get(this)._GetTooltip()}set isEnabled(e){v.get(this)._SetEnabled(e)}get isEnabled(){return v.get(this)._IsEnabled()}set isChecked(e){v.get(this)._SetChecked(e)}get isChecked(){return v.get(this)._IsChecked()}}}{const S=self.C3;S.Plugins.Button.Cnds={OnClicked(){return!0},IsChecked(){return this._isChecked},CompareText(e,t){return t?this._text===e:S.equalsNoCase(this._text,e)}}}{const V=self.C3;V.Plugins.Button.Acts={SetText(e){this._SetText(e)},SetTooltip(e){this._SetTooltip(e)},SetChecked(e){this._SetChecked(0!==e)},ToggleChecked(){this._isCheckbox&&(this._isChecked=!this._isChecked,this.UpdateElementState())}}}{const Z=self.C3;Z.Plugins.Button.Exps={Text(){return this._text}}}
 }
 
 // scripts/expTable.js
@@ -2799,18 +2831,14 @@ function or(l, r)
 }
 
 self.C3_ExpressionFuncs = [
-		() => "achievementkey",
-		() => "53bccce8f444c3e813c1",
-		() => "achievement",
-		() => "New one",
-		() => "Clicked",
-		() => "GOOD",
-		() => "Get list done",
-		p => {
-			const f0 = p._GetNode(0).GetBoundMethod();
-			return () => f0();
-		},
-		() => "Bad"
+		() => "SUCCESS",
+		() => "FAILURE",
+		() => "HP",
+		() => 63,
+		() => "SET SUCCESS",
+		() => "SET FAILURE",
+		() => "GET SUCCESS",
+		() => "GET FAILURE"
 ];
 
 
