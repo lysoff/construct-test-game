@@ -6,14 +6,14 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Button,
 		C3.Plugins.Button.Cnds.OnClicked,
 		C3.Plugins.PlaygamaBridge.Acts.AchievementsGetList,
-		C3.Plugins.PlaygamaBridge.Cnds.OnAchievementsGetListCompleted,
-		C3.Plugins.PlaygamaBridge.Cnds.IsLastActionCompletedSuccessfully,
 		C3.Plugins.Browser.Acts.ConsoleLog,
 		C3.Plugins.PlaygamaBridge.Acts.AppendStorageDataSetRequest,
 		C3.Plugins.PlaygamaBridge.Acts.SendStorageDataSetRequest,
-		C3.Plugins.PlaygamaBridge.Cnds.OnStorageDataSetRequestCompleted,
 		C3.Plugins.PlaygamaBridge.Acts.AppendStorageDataGetRequest,
 		C3.Plugins.PlaygamaBridge.Acts.SendStorageDataGetRequest,
+		C3.Plugins.PlaygamaBridge.Cnds.OnAchievementsGetListCompleted,
+		C3.Plugins.PlaygamaBridge.Cnds.IsLastActionCompletedSuccessfully,
+		C3.Plugins.PlaygamaBridge.Cnds.OnStorageDataSetRequestCompleted,
 		C3.Plugins.PlaygamaBridge.Cnds.OnStorageDataGetRequestCompleted
 	];
 };

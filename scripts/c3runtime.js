@@ -2831,10 +2831,11 @@ function or(l, r)
 }
 
 self.C3_ExpressionFuncs = [
-		() => "SUCCESS",
-		() => "FAILURE",
+		() => "Achievement List Called",
 		() => "HP",
 		() => 63,
+		() => "SUCCESS",
+		() => "FAILURE",
 		() => "SET SUCCESS",
 		() => "SET FAILURE",
 		() => "GET SUCCESS",
