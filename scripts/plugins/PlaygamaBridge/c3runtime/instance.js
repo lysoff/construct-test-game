@@ -2,7 +2,7 @@
 const { C3 } = globalThis
 
 {
-    C3.Plugins.PlaygamaBridge.Instance = class PlaygamaBridgeInstance extends C3.ISDKInstanceBase {
+    C3.Plugins.PlaygamaBridge.Instance = class PlaygamaBridgeInstance extends globalThis.ISDKInstanceBase {
         constructor() {
             super()
 
