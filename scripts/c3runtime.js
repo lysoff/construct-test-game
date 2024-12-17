@@ -1319,7 +1319,7 @@ function or(l, r)
 }
 
 self.C3_ExpressionFuncs = [
-		() => "completed"
+		() => "whatever"
 ];
 
 
