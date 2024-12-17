@@ -5,7 +5,9 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Browser,
 		C3.Plugins.Button,
 		C3.Plugins.Button.Cnds.OnClicked,
-		C3.Plugins.PlaygamaBridge.Acts.AchievementsShowNativePopup
+		C3.Plugins.PlaygamaBridge.Acts.AchievementsShowNativePopup,
+		C3.Plugins.PlaygamaBridge.Cnds.OnAchievementsShowNativePopupCompleted,
+		C3.Plugins.Browser.Acts.ConsoleLog
 	];
 };
 self.C3_JsPropNameTable = [

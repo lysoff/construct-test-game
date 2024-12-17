@@ -1,15 +1,16 @@
 'use strict'
-const { C3 } = globalThis
+
+const C3 = globalThis.C3
 
 {
     C3.Plugins.PlaygamaBridge.Instance = class PlaygamaBridgeInstance extends globalThis.ISDKInstanceBase {
         constructor() {
             super()
 
-            const properties = this._getInitProperties()
-
             this.conditions = C3.Plugins.PlaygamaBridge.Cnds
             this.actions = C3.Plugins.PlaygamaBridge.Acts
+
+            const properties = this._getInitProperties()
 
             let cdnUrl = 'https://cdn.jsdelivr.net/gh/playgama/bridge@1.19.0/dist/playgama-bridge.js'
             if (properties[1] !== '') {
@@ -267,13 +268,12 @@ const { C3 } = globalThis
             this.storageData = o.storageData || { }
         }
 
-        _getInitProperties() {
-            return [{
-                title: 'PlaygamaBridge',
-                properties: []
-            }]
-        }
-
+        // GetDebuggerProperties() {
+        //     return [{
+        //         title: 'PlaygamaBridge',
+        //         properties: []
+        //     }]
+        // } 
 
     }
 }
