@@ -1,6 +1,6 @@
 {
-	"name": "last",
-	"short_name": "last",
+	"name": "game",
+	"short_name": "game",
 	"description": "",
 	"start_url": "index.html",
 	"display": "fullscreen",
